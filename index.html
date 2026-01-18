@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support PP Maker</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'>
+      <circle cx='32' cy='32' r='32' fill='%231F3B5C'/>
+      <circle cx='32' cy='32' r='28' fill='%232A4A6E'/>
+      <text x='32' y='38' font-family='Arial, sans-serif' font-size='18' fill='white' text-anchor='middle' font-weight='bold'>SPPM</text>
+    </svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-enter { animation: modalIn 0.2s ease-out forwards; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .flag-active { 
+            border-color: #64748b !important; 
+            background-color: #334155 !important;
+            filter: grayscale(0) !important;
+            opacity: 1 !important;
+        }
+        #cropCanvas {
+            max-width: 100%;
+            max-height: 60vh;
+            cursor: move;
+            background: #000;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 font-sans min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-md flex flex-col items-center gap-6 fade-in">
+        <div class="text-center">
+            <h1 class="text-3xl font-black tracking-tight text-white mb-2 uppercase">Support PP Maker</h1>
+            <p class="text-sm text-slate-500 font-medium">Add a support frame to your profile picture</p>
+        </div>
+
+        <div class="w-full flex flex-col gap-4">
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <button onclick="setFlag('ua')" id="btn-ua" class="flag-active h-16 flex items-center justify-center border-2 border-slate-800 rounded-2xl transition-all bg-slate-900/50 opacity-40 grayscale hover:grayscale-0 hover:border-slate-700">
+                    <img src="https://flagcdn.com/w160/ua.png" alt="Ukraine" class="h-8 object-contain pointer-events-none">
+                </button>
+                <button onclick="setFlag('ps')" id="btn-ps" class="h-16 flex items-center justify-center border-2 border-slate-800 rounded-2xl transition-all bg-slate-900/50 opacity-40 grayscale hover:grayscale-0 hover:border-slate-700">
+                    <img src="https://flagcdn.com/w160/ps.png" alt="Palestine" class="h-8 object-contain pointer-events-none">
+                </button>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-2">
+                <button onclick="openSocialModal('github')" class="flex items-center gap-2 px-5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white hover:bg-slate-700 transition-all active:scale-95">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.11.82-.26.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GITHUB
+                </button>
+                <button onclick="openSocialModal('x')" class="flex items-center gap-2 px-5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white hover:bg-slate-700 transition-all active:scale-95">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    X
+                </button>
+            </div>
+
+            <div class="relative w-full">
+                <input type="file" id="uploadInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                <label for="uploadInput" class="group block w-full text-center border-2 border-dashed border-slate-800 rounded-3xl py-8 cursor-pointer hover:bg-slate-800/20 hover:border-slate-600 transition-all">
+                    <div class="flex flex-col items-center gap-2">
+                        <svg class="w-8 h-8 text-slate-600 group-hover:text-slate-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Upload Profile Photo</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="relative w-full aspect-square max-w-[300px] mx-auto group">
+            <canvas id="canvas" width="600" height="600" class="w-full h-full rounded-full bg-slate-900 shadow-2xl"></canvas>
+            <button onclick="resetToDefault()" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-700/90 text-white px-6 py-2.5 rounded-full text-xs font-black opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-600 border border-slate-500 backdrop-blur-sm">RESET</button>
+        </div>
+
+        <button onclick="downloadImage()" class="w-full bg-white text-slate-900 rounded-2xl py-5 text-sm font-black active:scale-[0.97] transition-all uppercase tracking-widest shadow-lg hover:bg-slate-100">Save Final Image</button>
+    </div>
+
+    <div id="socialModal" class="fixed inset-0 bg-slate-950/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-8 modal-enter shadow-2xl">
+            <div class="flex flex-col gap-5">
+                <div class="flex justify-between items-center">
+                    <h3 id="modalTitle" class="text-xl font-black text-white uppercase tracking-tighter">Platform</h3>
+                    <button onclick="closeSocialModal()" class="text-slate-500 hover:text-white transition-colors text-2xl">✕</button>
+                </div>
+                <input type="text" id="usernameInput" placeholder="Enter username..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 px-5 text-white outline-none focus:border-slate-500 transition-all">
+                <p id="errorMsg" class="text-red-500 text-xs text-center font-bold hidden">Profile not found or inaccessible.</p>
+                <button id="fetchBtn" onclick="fetchSocialProfile()" class="w-full bg-slate-100 text-slate-900 rounded-2xl py-4 font-black uppercase tracking-widest active:scale-[0.97] transition-all">Get Photo</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cropModal" class="fixed inset-0 bg-slate-950/95 z-[60] hidden flex flex-col items-center justify-center p-4 backdrop-blur-md">
+        <div class="w-full max-w-md bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 modal-enter">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                <h3 class="text-sm font-black text-white uppercase tracking-widest">Adjust Your Photo</h3>
+                <button onclick="closeCropModal()" class="text-slate-500 hover:text-white transition-colors">✕</button>
+            </div>
+            <div class="relative flex justify-center bg-black overflow-hidden p-4">
+                <canvas id="cropCanvas"></canvas>
+            </div>
+            <div class="p-6 flex flex-col gap-4 bg-slate-900">
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] font-bold uppercase text-slate-500">Zoom</span>
+                    <input type="range" id="zoomRange" min="0.1" max="3" step="0.01" value="1" class="flex-1 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-white">
+                </div>
+                <button onclick="applyCrop()" class="w-full bg-white text-slate-900 rounded-2xl py-4 font-black uppercase tracking-widest active:scale-[0.97] transition-all shadow-lg">Apply & Use</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const cropCanvas = document.getElementById('cropCanvas');
+        const cropCtx = cropCanvas.getContext('2d');
+        const zoomRange = document.getElementById('zoomRange');
+        
+        const defaultUserSrc = 'https://ppm.techforpalestine.org/_next/image?url=%2Fuser.jpg&w=256&q=75';
+        let currentFlag = 'ua';
+        let userImage = new Image();
+        userImage.crossOrigin = "anonymous";
+        userImage.src = defaultUserSrc;
+        
+        let rawImage = new Image();
+        let zoom = 1;
+        let offset = { x: 0, y: 0 };
+        let isDragging = false;
+        let lastPos = { x: 0, y: 0 };
+
+        const flags = {
+            ua: 'https://flagcdn.com/w640/ua.png',
+            ps: 'https://ppm.techforpalestine.org/bg.webp'
+        };
+
+        const flagCache = {};
+
+        userImage.onload = () => drawComposite();
+
+        function setFlag(code) {
+            currentFlag = code;
+            document.querySelectorAll('[id^="btn-"]').forEach(btn => btn.classList.remove('flag-active'));
+            document.getElementById(`btn-${code}`).classList.add('flag-active');
+            drawComposite();
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                rawImage = new Image();
+                rawImage.onload = () => openCropModal();
+                rawImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openCropModal() {
+            document.getElementById('cropModal').classList.remove('hidden');
+            zoom = Math.max(400 / rawImage.width, 400 / rawImage.height);
+            zoomRange.value = zoom;
+            offset = { x: 0, y: 0 };
+            renderCrop();
+        }
+
+        function closeCropModal() {
+            document.getElementById('cropModal').classList.add('hidden');
+        }
+
+        function renderCrop() {
+            cropCanvas.width = 400;
+            cropCanvas.height = 400;
+            cropCtx.clearRect(0, 0, 400, 400);
+            
+            const w = rawImage.width * zoom;
+            const h = rawImage.height * zoom;
+            const x = (400 - w) / 2 + offset.x;
+            const y = (400 - h) / 2 + offset.y;
+            
+            cropCtx.save();
+            cropCtx.drawImage(rawImage, x, y, w, h);
+            
+            cropCtx.globalCompositeOperation = 'destination-in';
+            cropCtx.beginPath();
+            cropCtx.arc(200, 200, 200, 0, Math.PI * 2);
+            cropCtx.fill();
+            cropCtx.restore();
+            
+            cropCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+            cropCtx.lineWidth = 2;
+            cropCtx.beginPath();
+            cropCtx.arc(200, 200, 199, 0, Math.PI * 2);
+            cropCtx.stroke();
+        }
+
+        cropCanvas.addEventListener('mousedown', e => { isDragging = true; lastPos = { x: e.clientX, y: e.clientY }; });
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            offset.x += e.clientX - lastPos.x;
+            offset.y += e.clientY - lastPos.y;
+            lastPos = { x: e.clientX, y: e.clientY };
+            renderCrop();
+        });
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        cropCanvas.addEventListener('touchstart', e => { 
+            isDragging = true; 
+            lastPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; 
+            e.preventDefault();
+        }, {passive: false});
+        cropCanvas.addEventListener('touchmove', e => {
+            if (!isDragging) return;
+            offset.x += e.touches[0].clientX - lastPos.x;
+            offset.y += e.touches[0].clientY - lastPos.y;
+            lastPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            renderCrop();
+            e.preventDefault();
+        }, {passive: false});
+        cropCanvas.addEventListener('touchend', () => isDragging = false);
+
+        zoomRange.oninput = (e) => { zoom = parseFloat(e.target.value); renderCrop(); };
+
+        function applyCrop() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 600;
+            tempCanvas.height = 600;
+            const tCtx = tempCanvas.getContext('2d');
+            
+            const ratio = 600 / 400;
+            const w = rawImage.width * zoom * ratio;
+            const h = rawImage.height * zoom * ratio;
+            const x = (600 - w) / 2 + offset.x * ratio;
+            const y = (600 - h) / 2 + offset.y * ratio;
+            
+            tCtx.drawImage(rawImage, x, y, w, h);
+            
+            userImage = new Image();
+            userImage.onload = () => {
+                drawComposite();
+                closeCropModal();
+            };
+            userImage.src = tempCanvas.toDataURL();
+        }
+
+        function openSocialModal(p) {
+            activePlatform = p;
+            document.getElementById('modalTitle').innerText = p;
+            document.getElementById('socialModal').classList.remove('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
+            document.getElementById('usernameInput').value = '';
+        }
+
+        function closeSocialModal() { document.getElementById('socialModal').classList.add('hidden'); }
+
+        async function fetchSocialProfile() {
+            let user = document.getElementById('usernameInput').value.trim();
+            if (!user) return;
+            const btn = document.getElementById('fetchBtn');
+            const err = document.getElementById('errorMsg');
+            btn.disabled = true;
+            btn.innerText = 'WAIT...';
+            if (user.startsWith('@')) user = user.substring(1);
+            
+            let url = activePlatform === 'github' ? `https://avatars.githubusercontent.com/${user}` : `https://unavatar.io/${activePlatform}/${user}`;
+            
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+                rawImage = img;
+                btn.disabled = false;
+                btn.innerText = 'GET PHOTO';
+                closeSocialModal();
+                openCropModal();
+            };
+            img.onerror = () => {
+                err.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerText = 'GET PHOTO';
+            };
+            img.src = url;
+        }
+
+        function resetToDefault() {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => { userImage = img; drawComposite(); };
+            img.src = defaultUserSrc;
+        }
+
+        function drawComposite() {
+            const flagSrc = flags[currentFlag];
+            const render = (flagImg) => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(300, 300, 300, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.drawImage(flagImg, 0, 0, 600, 600);
+                ctx.restore();
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(300, 300, 230, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.drawImage(userImage, 70, 70, 460, 460);
+                ctx.restore();
+            };
+
+            if (flagCache[flagSrc]) {
+                render(flagCache[flagSrc]);
+            } else {
+                const flagImg = new Image();
+                flagImg.crossOrigin = "anonymous";
+                flagImg.onload = () => { flagCache[flagSrc] = flagImg; render(flagImg); };
+                flagImg.src = flagSrc;
+            }
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = `support-${currentFlag}-pp.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
